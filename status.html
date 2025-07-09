@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live Appointments</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+  <script src="firebase.js"></script>
+
+  <style>
+    .staff-btn {
+      width: 90%;
+      display: block;
+      margin: 20px auto;
+      padding: 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .staff-btn:hover {
+      background-color: #45a049;
+    }
+
+    .queue-item {
+      list-style: none;
+      margin: 10px;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="color: purple;">Live Customer Status</h1>
+
+    
+
+    <ul id="queueList"></ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
