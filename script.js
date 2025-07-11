@@ -1,37 +1,33 @@
 const queueList = document.getElementById("queueList");
-const urlParams = new URLSearchParams(window.location.search);
-const pin = urlParams.get("pin");
 
-if (!pin) {
-  queueList.innerHTML = "<p class='error-message'>❌ Missing PIN. Invalid link.</p>";
+// Get the customer's PIN from the URL
+const urlParams = new URLSearchParams(window.location.search);
+const customerPin = urlParams.get("pin");
+
+if (!customerPin) {
+  document.body.innerHTML = `<h2 style="color:red;">Invalid link. No PIN provided.</h2>`;
   throw new Error("No PIN in URL");
 }
 
-// First check if the customer's appointment exists and if they're already served
-window.db.collection("appointments")
-  .where("pin", "==", pin)
-  .limit(1)
-  .get()
-  .then(snapshot => {
-    if (snapshot.empty) {
-      queueList.innerHTML = "<p class='error-message'>❌ Invalid or expired PIN.</p>";
-      return;
-    }
+// Check if the customer with this PIN exists
+window.db.collection("appointments").doc(customerPin).get().then((doc) => {
+  if (!doc.exists) {
+    document.body.innerHTML = `<h2 style="color:red;">This link has expired or does not exist.</h2>`;
+    return;
+  }
 
-    const data = snapshot.docs[0].data();
+  const data = doc.data();
+  if (data.status === "served") {
+    document.body.innerHTML = `<h2 style="color:red;">You have already been served. This link is no longer active.</h2>`;
+    return;
+  }
 
-    if (data.status === "served") {
-      queueList.innerHTML = "<p class='error-message'>✅ Your service is completed. This link has expired.</p>";
-      return;
-    }
-
-    // Show live queue if not served
-    showLiveQueue();
-  })
-  .catch(error => {
-    console.error("Error checking PIN:", error);
-    queueList.innerHTML = "<p class='error-message'>❌ Error loading status. Please try again later.</p>";
-  });
+  // Show live queue if still waiting or serving
+  showLiveQueue();
+}).catch((error) => {
+  console.error("Error checking PIN:", error);
+  document.body.innerHTML = `<h2 style="color:red;">Something went wrong. Please try again later.</h2>`;
+});
 
 function showLiveQueue() {
   window.db.collection("appointments")
@@ -44,6 +40,9 @@ function showLiveQueue() {
       snapshot.forEach((doc) => {
         const data = doc.data();
         if (data.status === "served") return;
+
+        // Make sure each person has their PIN in the data
+        data.pin = doc.id;
 
         if (data.status === "serving") {
           servingList.push(data);
@@ -60,14 +59,28 @@ function showLiveQueue() {
       fullList.forEach((person, index) => {
         const li = document.createElement("li");
         li.classList.add("queue-item");
-        if (person.status === "serving") {
-          li.classList.add("serving");
+
+        const isCurrentUser = (person.pin === customerPin);
+
+        let content = `<strong>${index + 1}. ${person.nickname}</strong>`;
+        if (isCurrentUser) {
+          content += ` <span style="color: red; font-weight: bold;">(👉 You)</span>`;
         }
 
-        let content = `<strong>${index + 1}. ${person.nickname}</strong> - ${person.type} - ${person.status}`;
+        content += ` - ${person.type} - ${person.status}`;
 
         if (person.status === "serving") {
-          content += `<br><span>⭐ Currently Serving....</span>`;
+          content += `<br>⭐<span style="font-weight: bold; color: green;">Currently Serving....</span>`;
+          li.style.backgroundColor = "#fff5d1";
+          li.style.borderLeft = "5px solid #facc15";
+        } else if (person.status === "waiting") {
+          li.style.backgroundColor = "#e0f2fe";
+          li.style.borderLeft = "5px solid #3b82f6";
+        }
+
+        if (isCurrentUser) {
+          li.style.border = "3px solid red";
+          li.style.backgroundColor = "#fde68a";
         }
 
         li.innerHTML = content;
