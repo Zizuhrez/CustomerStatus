@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Live Customer Status</title>
-  <link rel="stylesheet" href="style.css" />
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
@@ -12,18 +11,70 @@
   <script src="firebase.js"></script>
 
   <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9ff;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: purple;
+      margin-bottom: 25px;
+    }
+
+    ul#queueList {
+      padding: 0;
+      margin: 0;
+    }
+
     .queue-item {
       list-style: none;
-      margin: 10px;
+      background-color: #e0f2fe;
+      border-left: 5px solid #3b82f6;
       padding: 15px;
-      border-radius: 10px;
-      font-size: 16px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    .queue-item.serving {
+      background-color: #fff5d1;
+      border-left-color: #facc15;
+    }
+
+    .queue-item strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 5px;
+    }
+
+    .queue-item span {
+      display: block;
+      margin-top: 5px;
+      color: green;
+      font-weight: bold;
+    }
+
+    .error-message {
+      color: red;
+      font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 style="color: purple;">Live Customer Status</h1>
+    <h1>Live Customer Status</h1>
     <ul id="queueList">
       <li>Loading status...</li>
     </ul>
