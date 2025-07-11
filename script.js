@@ -43,14 +43,3 @@ window.db.collection("appointments")
       queueList.appendChild(li);
     });
   });
-
-// Staff panel access
-document.getElementById("goToStaff").addEventListener("click", () => {
-  const staffPin = prompt("Enter staff PIN:");
-  const correctPin = "2025";
-  if (staffPin === correctPin) {
-    window.location.href = "staff.html";
-  } else {
-    alert("Incorrect PIN. Access denied.");
-  }
-});
