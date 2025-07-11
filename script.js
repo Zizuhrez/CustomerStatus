@@ -1,56 +1,75 @@
 const queueList = document.getElementById("queueList");
 
-// Live queue display
-window.db.collection("appointments")
-  .orderBy("timestamp")
-  .onSnapshot((snapshot) => {
-    const servingList = [];
-    const waitingVipList = [];
-    const waitingRegularList = [];
+// Get the customer's PIN from the URL
+const urlParams = new URLSearchParams(window.location.search);
+const customerPin = urlParams.get("pin");
 
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      if (data.status === "served") return;
+if (!customerPin) {
+  document.body.innerHTML = `<h2 style="color:red;">Invalid link. No PIN provided.</h2>`;
+  throw new Error("No PIN in URL");
+}
 
-      if (data.status === "serving") {
-        servingList.push(data);
-      } else if (data.type === "VIP") {
-        waitingVipList.push(data);
-      } else {
-        waitingRegularList.push(data);
-      }
-    });
-
-    const fullList = [...servingList, ...waitingVipList, ...waitingRegularList];
-    queueList.innerHTML = "";
-
-    fullList.forEach((person, index) => {
-      const li = document.createElement("li");
-      li.classList.add("queue-item");
-
-      let content = `<strong>${index + 1}. ${person.nickname}</strong> - ${person.type} - ${person.status}`;
-
-      if (person.status === "serving") {
-        content += `<br>⭐<span style="font-weight: bold; color: green;">Currently Serving....</span>`;
-        li.style.backgroundColor = "#fff5d1";
-        li.style.borderLeft = "5px solid #facc15";
-      } else if (person.status === "waiting") {
-        li.style.backgroundColor = "#e0f2fe";
-        li.style.borderLeft = "5px solid #3b82f6";
-      }
-
-      li.innerHTML = content;
-      queueList.appendChild(li);
-    });
-  });
-
-// Staff panel access
-document.getElementById("goToStaff").addEventListener("click", () => {
-  const staffPin = prompt("Enter staff PIN:");
-  const correctPin = "2025";
-  if (staffPin === correctPin) {
-    window.location.href = "staff.html";
-  } else {
-    alert("Incorrect PIN. Access denied.");
+// Check if the customer with this PIN exists
+window.db.collection("appointments").doc(customerPin).get().then((doc) => {
+  if (!doc.exists) {
+    document.body.innerHTML = `<h2 style="color:red;">This link has expired or does not exist.</h2>`;
+    return;
   }
+
+  const data = doc.data();
+  if (data.status === "served") {
+    document.body.innerHTML = `<h2 style="color:red;">You have already been served. This link is no longer active.</h2>`;
+    return;
+  }
+
+  // Show live queue if still waiting or serving
+  showLiveQueue();
+}).catch((error) => {
+  console.error("Error checking PIN:", error);
+  document.body.innerHTML = `<h2 style="color:red;">Something went wrong. Please try again later.</h2>`;
 });
+
+function showLiveQueue() {
+  window.db.collection("appointments")
+    .orderBy("timestamp")
+    .onSnapshot((snapshot) => {
+      const servingList = [];
+      const waitingVipList = [];
+      const waitingRegularList = [];
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.status === "served") return;
+
+        if (data.status === "serving") {
+          servingList.push(data);
+        } else if (data.type === "VIP") {
+          waitingVipList.push(data);
+        } else {
+          waitingRegularList.push(data);
+        }
+      });
+
+      const fullList = [...servingList, ...waitingVipList, ...waitingRegularList];
+      queueList.innerHTML = "";
+
+      fullList.forEach((person, index) => {
+        const li = document.createElement("li");
+        li.classList.add("queue-item");
+
+        let content = `<strong>${index + 1}. ${person.nickname}</strong> - ${person.type} - ${person.status}`;
+
+        if (person.status === "serving") {
+          content += `<br>⭐<span style="font-weight: bold; color: green;">Currently Serving....</span>`;
+          li.style.backgroundColor = "#fff5d1";
+          li.style.borderLeft = "5px solid #facc15";
+        } else if (person.status === "waiting") {
+          li.style.backgroundColor = "#e0f2fe";
+          li.style.borderLeft = "5px solid #3b82f6";
+        }
+
+        li.innerHTML = content;
+        queueList.appendChild(li);
+      });
+    });
+}
