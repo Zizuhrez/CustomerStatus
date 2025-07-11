@@ -41,7 +41,7 @@ function showLiveQueue() {
         const data = doc.data();
         if (data.status === "served") return;
 
-        // Make sure each person has their PIN in the data
+        // Add PIN for comparison
         data.pin = doc.id;
 
         if (data.status === "serving") {
