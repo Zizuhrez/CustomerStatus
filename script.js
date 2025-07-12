@@ -61,21 +61,15 @@ function showLiveQueue() {
 
         const isCurrentUser = (person.pin === customerPin);
 
-        // Name line
-        let content = `<strong>${index + 1}. ${person.nickname}</strong>`;
+        let content = `<strong>${index + 1}. ${person.nickname}`;
         if (isCurrentUser) {
           content += ` <span style="color: orange; font-weight: bold;">(👉 You)</span>`;
         }
-
-        content += `<br>- ${person.type} - ${person.status}`;
+        content += `</strong> - ${person.type} - ${person.status}`;
 
         if (person.status === "serving") {
           content += `<br>⭐<span style="font-weight: bold; color: green;">Currently Serving....</span>`;
-          li.style.backgroundColor = "#fff5d1";
-          li.style.borderLeft = "5px solid #facc15";
-        } else if (person.status === "waiting") {
-          li.style.backgroundColor = "#e0f2fe";
-          li.style.borderLeft = "5px solid #3b82f6";
+          li.classList.add("serving");
         }
 
         if (isCurrentUser) {
