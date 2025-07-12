@@ -41,8 +41,7 @@ function showLiveQueue() {
         const data = doc.data();
         if (data.status === "served") return;
 
-        // Add PIN for comparison
-        data.pin = doc.id;
+        data.pin = doc.id; // Add PIN from document ID
 
         if (data.status === "serving") {
           servingList.push(data);
@@ -80,7 +79,6 @@ function showLiveQueue() {
 
         if (isCurrentUser) {
           li.style.border = "3px solid red";
-          li.style.backgroundColor = "#fde68a";
         }
 
         li.innerHTML = content;
