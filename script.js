@@ -61,9 +61,10 @@ function showLiveQueue() {
 
         const isCurrentUser = (person.pin === customerPin);
 
+        // Construct name + (👉 You) on same line
         let content = `<strong>${index + 1}. ${person.nickname}`;
         if (isCurrentUser) {
-          content += ` <span style="color: orange; font-weight: bold;">(👉 You)</span>`;
+          content += ` <span style="color: orange; font-weight: bold; display: inline;">(👉 You)</span>`;
         }
         content += `</strong><br> - ${person.type} - ${person.status}`;
 
