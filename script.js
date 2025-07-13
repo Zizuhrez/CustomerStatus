@@ -65,7 +65,7 @@ function showLiveQueue() {
         if (isCurrentUser) {
           content += ` <span style="color: orange; font-weight: bold;">(👉 You)</span>`;
         }
-        content += `</strong> - ${person.type} - ${person.status}`;
+        content += `</strong><br> - ${person.type} - ${person.status}`;
 
         if (person.status === "serving") {
           content += `<br>⭐<span style="font-weight: bold; color: green;">Currently Serving....</span>`;
